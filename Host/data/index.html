@@ -1,0 +1,209 @@
+<!DOCTYPE HTML><html>
+<head>
+  <title>Host - Modulos Solares ESP32</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <style>
+    body {
+      min-width: 310px;
+    	max-width: 800px;
+    	height: 400px;
+      margin: 0 auto;
+    }
+    h2 {
+      font-family: Arial;
+      font-size: 2.5rem;
+      text-align: center;
+      color: white;
+    }
+    .topnav {
+      overflow: hidden;
+      background-color: #050813;
+    }
+  </style>
+</head>
+<body>
+  <div class="topnav">
+    <h2>ESP32 - Estação Solar</h2>
+</div>
+  <div id="chart-vertical" class="container"></div>
+  <div id="chart-horizontal" class="container"></div>
+  <div id="chart-tension" class="container"></div>
+  <div id="chart-current" class="container"></div>
+  <div style="text-align: center;"><button onclick="downloadData()" class="btn btn-primary">Download Host Data</button> <button onclick="downloadDataTracker()" class="btn btn-success">Download Client Data</button></div>
+</body>
+<script>
+
+var dataLength = 40;
+
+var chartVertical = new Highcharts.Chart({
+  chart:{ renderTo : 'chart-vertical' },
+  title: { text: 'Servo Motor - Vertical' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    },
+    series: { color: '#059e8a' }
+  },
+  xAxis: { type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title: { text: 'Angulação Vertical (°)' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+      if(chartVertical.series[0].data.length > dataLength) {
+        chartVertical.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartVertical.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/vertical", true);
+  xhttp.send();
+}, 5000 ) ;
+
+var chartHorizontal = new Highcharts.Chart({
+  chart:{ renderTo:'chart-horizontal' },
+  title: { text: 'Servo Motor - Horizontal' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+  plotOptions: {
+    line: { animation: true,
+      dataLabels: { enabled: true }
+    }
+  },
+  xAxis: {
+    type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title: { text: 'Angulação Horizontal (°)' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+      if(chartHorizontal.series[0].data.length > dataLength) {
+        chartHorizontal.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartHorizontal.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/horizontal", true);
+  xhttp.send();
+}, 5000 ) ;
+
+var chartTension = new Highcharts.Chart({
+  chart:{ renderTo:'chart-tension' },
+  title: { text: 'Tensão Módulo Solar' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    },
+    series: { color: '#18009c' }
+  },
+  xAxis: {
+    type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title: { text: 'Tensão (V)' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+      if(chartTension.series[0].data.length > dataLength) {
+        chartTension.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartTension.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/tension", true);
+  xhttp.send();
+}, 5000 ) ;
+
+var chartCurrent = new Highcharts.Chart({
+  chart:{ renderTo:'chart-current' },
+  title: { text: 'Corrente Módulo Solar' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    },
+    series: { color: '#18009c' }
+  },
+  xAxis: {
+    type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title: { text: 'Corrente (mA)' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+      //console.log(this.responseText);
+      if(chartCurrent.series[0].data.length > dataLength) {
+        chartCurrent.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartCurrent.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/current", true);
+  xhttp.send();
+}, 5000 ) ;
+
+
+function downloadData() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "/downloaddata", true);
+  xhttp.send();
+  window.location.href = "/downloaddata";
+}
+function downloadDataTracker() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "/downloaddatatracker", true);
+  xhttp.send();
+  window.location.href = "/downloaddatatracker";
+}
+</script>
+</html>
